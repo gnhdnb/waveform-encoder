@@ -37,7 +37,7 @@ def findNextBestCandidate(y, start, candidates, windowSize):
     corrMap = np.correlate(y[start:(start + windowSize * 2)], y[start:(start + windowSize)])
     return candidates[np.argmax(corrMap[candidates])]
 
-def uniform(y, lastWaveformPoint, bestCandidate, oversampling = 2, encoderWidth = 600):
+def uniform(y, lastWaveformPoint, bestCandidate, oversampling, encoderWidth):
     waveform = np.interp(np.linspace(0, bestCandidate, bestCandidate * oversampling), \
                      np.arange(0, encoderWidth), \
                      y[lastWaveformPoint:lastWaveformPoint + encoderWidth])
@@ -58,7 +58,7 @@ def uniform(y, lastWaveformPoint, bestCandidate, oversampling = 2, encoderWidth 
     
     return waveform[0:encoderWidth]
 
-def split(y, wavelengthMap, encoderWidth = 600):
+def split(y, wavelengthMap, oversampling = 2, encoderWidth = 600):
     zeroCrossings = np.nonzero(librosa.zero_crossings(y))
     
     lastWaveformPoint = 0
@@ -84,7 +84,7 @@ def split(y, wavelengthMap, encoderWidth = 600):
             if(len(waveformCandidates) > 0):
                 bestCandidate = findNextBestCandidate(y, lastWaveformPoint, waveformCandidates, max(windowSize, max(waveformCandidates)))
                 
-                waveform = uniform(y, lastWaveformPoint, bestCandidate)
+                waveform = uniform(y, lastWaveformPoint, bestCandidate, oversampling, encoderWidth)
                 result.append(waveform)
 
                 lastWaveformPoint = lastWaveformPoint + bestCandidate
