@@ -1,4 +1,4 @@
-# Encoding monophonic timbres with pitch variation
+# Encoding monophonic signal with pitch variation
 
 This repo contains: 
 - Tooling to split monophonic signal into a set of fixed-size waveforms and to reconstruct the signal
