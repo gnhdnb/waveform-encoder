@@ -3,3 +3,4 @@
 __pycache__/*
 waveforms/human-voice-output/*
 waveforms/human-voice/wav/*
+render-human-voice.wav
