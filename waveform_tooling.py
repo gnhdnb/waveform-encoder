@@ -4,6 +4,9 @@ import scipy as sp
 import datetime
 import math, random
 
+lastCrossingPoint = 'lastCrossingPoint'
+stretch = 'stretch'
+
 def getWavelengthMap(input, lowerLimit = 16, upperLimit = 300):
     if (lowerLimit < 16):
         lowerLimit = 16
@@ -37,7 +40,7 @@ def findNextBestCandidate(y, start, candidates, windowSize):
     corrMap = np.correlate(y[start:(start + windowSize * 2)], y[start:(start + windowSize)])
     return candidates[np.argmax(corrMap[candidates])]
 
-def uniform(y, lastWaveformPoint, bestCandidate, oversampling, encoderWidth):
+def uniformLastCrossingPoint(y, lastWaveformPoint, bestCandidate, oversampling, encoderWidth):
     waveform = np.interp(np.linspace(0, bestCandidate, bestCandidate * oversampling), \
                      np.arange(0, encoderWidth), \
                      y[lastWaveformPoint:lastWaveformPoint + encoderWidth])
@@ -58,12 +61,24 @@ def uniform(y, lastWaveformPoint, bestCandidate, oversampling, encoderWidth):
     
     return waveform[0:encoderWidth]
 
-def split(y, wavelengthMap, oversampling = 2, encoderWidth = 600):
+def uniformStretch(y, lastWaveformPoint, bestCandidate, encoderWidth):
+    return np.interp(np.linspace(0, bestCandidate, encoderWidth), \
+                     np.arange(0, bestCandidate), \
+                     y[lastWaveformPoint:lastWaveformPoint + bestCandidate])
+
+def uniform(y, lastWaveformPoint, bestCandidate, mode, oversampling, encoderWidth):
+    if (mode == lastCrossingPoint):
+        return uniformLastCrossingPoint(y, lastWaveformPoint, bestCandidate, oversampling, encoderWidth)
+    elif (mode == stretch):
+        return uniformStretch(y, lastWaveformPoint, bestCandidate, encoderWidth)
+
+def split(y, wavelengthMap, oversampling = 2, encoderWidth = 600, mode = lastCrossingPoint):
     zeroCrossings = np.nonzero(librosa.zero_crossings(y))
     
     lastWaveformPoint = 0
     
-    result = []
+    waveforms = []
+    wavelengths = []
     
     waveformCandidates = []
     
@@ -84,8 +99,9 @@ def split(y, wavelengthMap, oversampling = 2, encoderWidth = 600):
             if(len(waveformCandidates) > 0):
                 bestCandidate = findNextBestCandidate(y, lastWaveformPoint, waveformCandidates, max(windowSize, max(waveformCandidates)))
                 
-                waveform = uniform(y, lastWaveformPoint, bestCandidate, oversampling, encoderWidth)
-                result.append(waveform)
+                waveform = uniform(y, lastWaveformPoint, bestCandidate, mode, oversampling, encoderWidth)
+                waveforms.append(waveform)
+                wavelengths.append(bestCandidate)
 
                 lastWaveformPoint = lastWaveformPoint + bestCandidate
                 
@@ -99,12 +115,37 @@ def split(y, wavelengthMap, oversampling = 2, encoderWidth = 600):
                 lastWaveformPoint = crossingPoint
                 waveformCandidates = []
 
-    return result
+    return waveforms, wavelengths
 
-def merge(waveforms, oversampling = 2):
+def merge(waveforms, oversampling = 2, wavelengths = None, mode = lastCrossingPoint):
+    if(mode == lastCrossingPoint):
+        return mergeLastCrossingPoint(waveforms, oversampling)
+    elif(mode == stretch):
+        if (wavelengths is None):
+            raise ValueError("wavelengths are required for this mode")
+        
+        return mergeStretch(waveforms, wavelengths, mode)
+
+def mergeStretch(waveforms, wavelengths, mode):
+    if(len(waveforms) != len(wavelengths)):
+        raise ValueError("waveforms and wavelengths has to be exact length")
+
+    output = np.empty(0)
+
+    for waveform, wavelength in zip(waveforms, wavelengths):
+        originalWaveform = np.interp(np.linspace(0, len(waveform), wavelength), \
+                             np.arange(0, len(waveform)), waveform)
+
+        output = np.concatenate((output, originalWaveform))
+
+    return output
+        
+
+def mergeLastCrossingPoint(waveforms, oversampling = 2):
     output = np.empty(0)
     
     tail = None
+    
     for waveform in waveforms:
         waveform = np.interp(np.linspace(0, len(waveform), len(waveform) // oversampling), \
                              np.arange(0, len(waveform)), waveform)
