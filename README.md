@@ -16,4 +16,5 @@ Some examples:
 Two methods for wavelength encoding are provided:
 
 - encoding by last zero-crossing point
+
 ![Encoding F0](https://github.com/gnhdnb/waveform-encoder/raw/master/readme/encoding-pitch.png "Encoding F0")
