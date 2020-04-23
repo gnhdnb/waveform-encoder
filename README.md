@@ -1,7 +1,7 @@
-# Encoding monophonic signal with variable wavelength
+# Encoding variable-pitch monophonic signal with waveform autoencoder
 
 This repo contains: 
-- Tooling to split monophonic signal into a set of waveforms and to reconstruct the signal
+- Tooling to split monophonic signal into a set of fixed-width waveforms and to reconstruct the signal
 - Basic waveform autoencoder
 
 Take a look at `demo-last-crossing-point.ipynb` and `demo-stretch.ipynb` for a short demo
