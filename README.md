@@ -10,8 +10,8 @@ Some examples:
 - [Voice, reconstructed from the latent vectors (stretch)](https://flakycdn.blob.core.windows.net/various/render-human-voice-stretch.wav)
 - [Voice, reconstructed from the latent vectors (last crossing point)](https://flakycdn.blob.core.windows.net/various/render-human-voice.wav)
 - [Voice, reconstructed from the original set of waveforms with fixed pitch (stretch)](https://flakycdn.blob.core.windows.net/various/reconstructed-fixed-pitch.wav)
-- [AKWF waveforms library, encoded with the human voice autoencoder](https://flakycdn.blob.core.windows.net/various/akwf.wav)
-- [Voice with fixed pitch and some gaussian smoothing applied in the latent space](https://flakycdn.blob.core.windows.net/various/latent-space-filter.wav)
+- [AKWF waveforms library, encoded with the human voice autoencoder (last crossing point)](https://flakycdn.blob.core.windows.net/various/akwf.wav)
+- [Voice with fixed pitch and some gaussian smoothing applied in the latent space (stretch)](https://flakycdn.blob.core.windows.net/various/latent-space-filter.wav)
 
 
 Two methods for wavelength encoding are provided:
